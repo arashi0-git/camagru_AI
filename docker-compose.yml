@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: camagru_app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=camagru
+      - DB_USER=camagru
+      - DB_PASSWORD=camagru_secret
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+    depends_on:
+      - db
+      - mailhog
+
+  db:
+    image: postgres:15-alpine
+    container_name: camagru_db
+    environment:
+      - POSTGRES_USER=camagru
+      - POSTGRES_PASSWORD=camagru_secret
+      - POSTGRES_DB=camagru
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: camagru_mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+
+volumes:
+  db_data:
